@@ -29,12 +29,32 @@ async function api(path, body) {
   });
   const j = await r.json().catch(() => ({}));
   if (r.status === 401) {
-    password = prompt('Senha do site:') || '';
+    password = await askPassword(!!password);
     localStorage.setItem('appPassword', password);
-    if (password) return api(path, body);
+    return api(path, body);
   }
   if (!r.ok) throw new Error(j.error || `Erro ${r.status}`);
   return j;
+}
+
+// tela de login (uma só, mesmo com várias chamadas ao mesmo tempo)
+let loginPromise = null;
+function askPassword(wrong) {
+  if (loginPromise) return loginPromise;
+  const box = $('#login');
+  box.classList.remove('hidden');
+  $('#login-err').classList.toggle('hidden', !wrong);
+  $('#login-pass').value = '';
+  setTimeout(() => $('#login-pass').focus(), 50);
+  loginPromise = new Promise((resolve) => {
+    $('#login-form').onsubmit = (e) => {
+      e.preventDefault();
+      box.classList.add('hidden');
+      loginPromise = null;
+      resolve($('#login-pass').value);
+    };
+  });
+  return loginPromise;
 }
 
 // ------------------------------------------------------------------ abas

@@ -12,13 +12,20 @@ const ind = require('./src/indicators');
 const { PaperBroker } = require('./src/brokers/paper');
 const { MT5Broker } = require('./src/brokers/mt5');
 
+const os = require('os');
 const PORT = Number(process.env.PORT || 3000);
-const HOST = process.env.HOST || '127.0.0.1';
+// Na nuvem (Render, Railway...) a variável PORT já vem definida e precisamos aceitar conexões externas.
+const HOST = process.env.HOST || (process.env.RENDER || process.env.RAILWAY_ENVIRONMENT || process.env.FLY_APP_NAME ? '0.0.0.0' : '127.0.0.1');
 const TICK_SECONDS = Math.max(10, Number(process.env.TICK_SECONDS || 60));
 const SIM_TICK_SECONDS = Math.max(2, Number(process.env.SIM_TICK_SECONDS || 5));
 const APP_PASSWORD = process.env.APP_PASSWORD || '';
 const REAL_ENABLED = process.env.REAL_TRADING_ENABLED === 'true';
-const DATA_DIR = path.join(__dirname, 'data');
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
+
+if (HOST !== '127.0.0.1' && HOST !== 'localhost' && !APP_PASSWORD) {
+  console.error('\n  ERRO: o site está aberto para outros aparelhos (HOST=' + HOST + '), então defina uma senha em APP_PASSWORD no .env.\n');
+  process.exit(1);
+}
 fs.mkdirSync(DATA_DIR, { recursive: true });
 
 const market = new Market();
@@ -216,6 +223,10 @@ async function loop() {
   if (!paperBot.state.equity.length) { paperBot.recordEquity(); paperBot.save(); }
   app.listen(PORT, HOST, () => {
     console.log(`\n  Robô B3 rodando em http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
+    if (HOST === '0.0.0.0') {
+      const ips = Object.values(os.networkInterfaces()).flat().filter((i) => i && i.family === 'IPv4' && !i.internal).map((i) => i.address);
+      for (const ip of ips) console.log(`  No celular/iPad (mesmo Wi-Fi): http://${ip}:${PORT}`);
+    }
     console.log(`  Dados de mercado: ${market.source}`);
     console.log(`  Modo real: ${REAL_ENABLED ? 'ATIVADO' : 'desativado'}\n`);
   });

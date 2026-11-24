@@ -1,0 +1,21 @@
+# Deploy em 1 clique no Render (render.com): New + > Blueprint > escolha este repositório.
+services:
+  - type: web
+    name: robo-b3
+    runtime: node
+    plan: starter            # plano pago (~US$ 7/mês): fica ligado 24h e guarda os dados no disco
+    buildCommand: npm ci --omit=dev
+    startCommand: node server.js
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: DATA_DIR
+        value: /var/data
+      - key: APP_PASSWORD
+        sync: false          # o Render vai pedir para você digitar a senha
+      - key: REAL_TRADING_ENABLED
+        value: "false"
+    disk:
+      name: dados
+      mountPath: /var/data
+      sizeGB: 1

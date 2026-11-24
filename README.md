@@ -26,6 +26,45 @@ Abra **http://localhost:3000**, vá na aba **Teste** e clique em **▶ Iniciar**
 
 Os dados ficam salvos em `data/` — se desligar e ligar de novo, o robô continua de onde parou.
 
+## Abrir no celular, iPad e PC 📱💻
+
+O robô é um **programa que roda num computador** (o "servidor"). O celular e o iPad só abrem o site dele, pelo navegador. Eles não conseguem rodar o robô sozinhos. Escolha uma das opções:
+
+### Opção A — PC ligado em casa (grátis)
+
+O PC roda o robô, e o celular/iPad abrem pelo mesmo Wi-Fi.
+
+1. No `.env` do PC:
+   ```
+   HOST=0.0.0.0
+   APP_PASSWORD=uma-senha-forte
+   ```
+2. `npm start`. Vai aparecer algo como:
+   ```
+   No celular/iPad (mesmo Wi-Fi): http://192.168.0.15:3000
+   ```
+3. Digite **esse endereço** no Safari do iPad/celular (não use `localhost`, que só funciona no próprio PC) e entre com a senha.
+4. Se não abrir: o Windows pode pedir para liberar o Node no firewall. Clique em **Permitir** (rede privada).
+
+O PC precisa ficar ligado e não pode entrar em suspensão.
+
+### Opção B — Na nuvem (abre de qualquer lugar, até no 4G)
+
+O robô fica num servidor 24h e você abre de qualquer aparelho, em qualquer lugar.
+
+1. Crie uma conta em [render.com](https://render.com) e conecte seu GitHub.
+2. **New + → Blueprint** → escolha este repositório (ele lê o `render.yaml`).
+3. Digite uma senha em `APP_PASSWORD` quando pedir.
+4. Em alguns minutos o Render te dá um link `https://robo-b3-xxxx.onrender.com`. Abra no iPad, celular e PC.
+
+O `render.yaml` usa o plano *Starter* (pago, ~US$ 7/mês) porque no plano grátis o servidor "dorme" quando ninguém está usando, aí o robô para, e os dados se perdem a cada reinício. Também funciona em qualquer serviço que rode Docker (tem um `Dockerfile`).
+
+> **Modo real na nuvem:** o MetaTrader 5 precisa de Windows. Nesse caso use a opção A, ou um VPS Windows rodando o site + MT5 juntos.
+
+### Instalar como app
+
+No Safari do iPhone/iPad: botão **Compartilhar → Adicionar à Tela de Início**. No Android/Chrome: **⋮ → Instalar app**. Fica com ícone e abre em tela cheia, como um aplicativo.
+
 ## Como o robô decide
 
 A cada ciclo (60 s), para cada ação:

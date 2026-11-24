@@ -81,7 +81,7 @@ class Bot {
     const eq = this.equity();
     const now = Math.floor(Date.now() / 1000);
     const arr = this.state.equity;
-    if (arr.length && now - arr[arr.length - 1].time < 5) arr[arr.length - 1] = { time: now, value: r2(eq) };
+    if (arr.length && now - arr[arr.length - 1].time < 1) arr[arr.length - 1] = { time: now, value: r2(eq) };
     else arr.push({ time: now, value: r2(eq) });
     if (arr.length > 3000) arr.splice(0, arr.length - 3000);
   }
