@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Robô B3</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="/vendor/lightweight-charts.js"></script>
+</head>
+<body>
+  <header>
+    <div class="brand">📊 <b>Robô B3</b></div>
+    <nav id="tabs">
+      <button data-tab="market" class="active">Mercado</button>
+      <button data-tab="paper">Teste (R$ 10 mil)</button>
+      <button data-tab="analysis">Estratégias</button>
+      <button data-tab="real">Modo Real</button>
+    </nav>
+    <div id="status" class="status"></div>
+  </header>
+
+  <div id="sim-banner" class="banner hidden">
+    ⚠️ Sem acesso às cotações reais — mostrando <b>dados simulados</b> (cada ciclo = 1 pregão acelerado). Rode o site num computador com internet para usar a bolsa de verdade.
+  </div>
+
+  <main>
+    <!-- MERCADO -->
+    <section id="tab-market" class="tab active">
+      <div id="quotes" class="quotes"></div>
+      <div class="card">
+        <div class="row between">
+          <h2 id="chart-title">—</h2>
+          <div class="seg" id="range-seg">
+            <button data-range="daily" class="active">Diário (1 ano)</button>
+            <button data-range="intraday">Hoje (5 min)</button>
+          </div>
+        </div>
+        <div class="legend"><span class="l-sma9">Média 9</span><span class="l-sma21">Média 21</span><span>▲ compra / ▼ venda do robô de teste</span><span id="rsi-now"></span></div>
+        <div id="price-chart" class="chart"></div>
+      </div>
+      <div class="card">
+        <h3>O que cada estratégia diz agora</h3>
+        <div id="signals-now" class="signals"></div>
+      </div>
+    </section>
+
+    <!-- TESTE -->
+    <section id="tab-paper" class="tab">
+      <div class="intro">Conta de teste com <b>R$ 10.000 virtuais</b>. O robô opera de verdade (com as cotações reais), mas o dinheiro é de mentira. Deixe rodando para ver como ele se sai antes de arriscar dinheiro real.</div>
+      <div data-bot="paper"></div>
+    </section>
+
+    <!-- ESTRATÉGIAS -->
+    <section id="tab-analysis" class="tab">
+      <div class="intro">Backtest: cada estratégia foi testada no último ano de cada ação, com taxas da B3, stop loss e take profit. A melhor de cada ação (retorno descontando risco) fica marcada ⭐ e é a usada pelo robô no modo <b>Automático</b>.</div>
+      <div id="analysis"></div>
+      <div id="strategy-help" class="card"></div>
+    </section>
+
+    <!-- REAL -->
+    <section id="tab-real" class="tab">
+      <div class="card danger-card">
+        <h3>⚠️ Dinheiro de verdade</h3>
+        <p>Neste modo o robô envia ordens reais para a <b>sua conta na corretora</b> (via MetaTrader 5). O dinheiro nunca passa por este site: o depósito e o saque para o seu banco são feitos por Pix/TED no app da corretora. Aqui você escolhe <b>quanto do saldo o robô pode usar</b> (aporte) e <b>devolve</b> esse dinheiro quando quiser (saque).</p>
+        <p class="muted">Investimento em ações tem risco. Resultados passados (backtest e modo teste) não garantem resultados futuros. Comece com uma conta demo da corretora e valores pequenos.</p>
+      </div>
+      <div id="real-status" class="card"></div>
+      <div data-bot="real"></div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="app.js"></script>
+</body>
+</html>
