@@ -6,7 +6,10 @@ services:
     plan: starter            # plano pago (~US$ 7/mês): fica ligado 24h e guarda os dados no disco
     buildCommand: npm ci --omit=dev
     startCommand: node server.js
+    healthCheckPath: /healthz
     envVars:
+      - key: NODE_VERSION
+        value: "22"
       - key: HOST
         value: 0.0.0.0
       - key: DATA_DIR

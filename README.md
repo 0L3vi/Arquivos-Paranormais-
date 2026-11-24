@@ -50,16 +50,27 @@ O PC precisa ficar ligado e não pode entrar em suspensão.
 
 ### Opção B — Na nuvem (abre de qualquer lugar, até no 4G)
 
-O robô fica num servidor 24h e você abre de qualquer aparelho, em qualquer lugar.
+O robô fica ligado 24h num servidor do [Render](https://render.com), e você abre de qualquer aparelho.
 
-1. Crie uma conta em [render.com](https://render.com) e conecte seu GitHub.
-2. **New + → Blueprint** → escolha este repositório (ele lê o `render.yaml`).
-3. Digite uma senha em `APP_PASSWORD` quando pedir.
-4. Em alguns minutos o Render te dá um link `https://robo-b3-xxxx.onrender.com`. Abra no iPad, celular e PC.
+1. Entre em **render.com → Get Started** e crie a conta com **"Sign in with GitHub"**.
+2. Cadastre um cartão em **Account Settings → Billing**. O plano Starter custa ~US$ 7/mês e é o que deixa o robô ligado 24h.
+3. No painel, clique em **New + → Blueprint**.
+4. Clique em **Connect** no repositório `Arquivos-Paranormais-` (se ele não aparecer, clique em *Configure account* e libere o acesso a ele).
+5. Em **Branch**, escolha `claude/great-euler-4jx2rz`.
+6. Ele mostra o serviço **robo-b3**. No campo **APP_PASSWORD**, digite a senha que você vai usar para entrar no site.
+7. Clique em **Deploy Blueprint** e espere uns 3–5 minutos, até ficar **Live** (verde).
+8. Clique em **robo-b3**. O link aparece em cima, tipo `https://robo-b3-abcd.onrender.com`.
+9. Abra esse link no iPad, no celular e no PC, entre com a senha e vá em **Teste → ▶ Iniciar**.
 
-O `render.yaml` usa o plano *Starter* (pago, ~US$ 7/mês) porque no plano grátis o servidor "dorme" quando ninguém está usando, aí o robô para, e os dados se perdem a cada reinício. Também funciona em qualquer serviço que rode Docker (tem um `Dockerfile`).
+Dicas:
+- Toda vez que o código mudar no GitHub, o Render atualiza sozinho.
+- O robô continua rodando mesmo com todos os aparelhos desligados.
+- Em **Logs**, no Render, dá para ver o que o robô está fazendo.
+- Se aparecer o aviso amarelo de "dados simulados", é porque o Yahoo não respondeu. O site tenta de novo a cada 10 minutos e, quando conseguir, recomeça a conta de teste com os preços de verdade.
 
-> **Modo real na nuvem:** o MetaTrader 5 precisa de Windows. Nesse caso use a opção A, ou um VPS Windows rodando o site + MT5 juntos.
+Também funciona em qualquer serviço que rode Docker (tem um `Dockerfile`).
+
+> **Modo real na nuvem:** o MetaTrader 5 precisa de Windows. Nesse caso use a opção A, ou um servidor (VPS) Windows rodando o site + MT5 juntos.
 
 ### Instalar como app
 

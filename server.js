@@ -48,6 +48,7 @@ function refreshBacktests(force = false) {
 // ---------------------------------------------------------------- API
 const app = express();
 app.use(express.json());
+app.get('/healthz', (_req, res) => res.json({ ok: true, source: market.source }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/vendor/lightweight-charts.js', (_req, res) =>
   res.sendFile(path.join(__dirname, 'node_modules/lightweight-charts/dist/lightweight-charts.standalone.production.js')));
@@ -204,9 +205,21 @@ app.get('/api/real/status', wrap(async () => {
 }));
 
 // ---------------------------------------------------------------- loop principal
+let lastSource = null;
 async function loop() {
   try {
     await market.refresh();
+    // se os dados simulados foram trocados pelos reais, os preços mudam totalmente:
+    // recomeça a conta de teste para não misturar as duas coisas
+    if (lastSource === 'simulado' && market.source === 'yahoo') {
+      refreshBacktests(true);
+      const wasRunning = paperBot.state.running;
+      paperBot.reset();
+      paperBot.state.running = wasRunning;
+      paperBot.log('Cotações reais disponíveis — conta de teste reiniciada com R$ 10.000 usando os preços de verdade.', 'warn');
+      paperBot.save();
+    }
+    lastSource = market.source;
     refreshBacktests();
     await paperBot.tick();
     if (REAL_ENABLED) await realBot.tick();

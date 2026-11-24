@@ -63,24 +63,41 @@ class Market {
     this.simRand = mulberry32(Date.now() % 100000);
   }
 
-  async init() {
+  async init(retries = 3) {
+    for (let i = 1; i <= retries; i++) {
+      if (await this.tryReal()) return;
+      if (i < retries) await new Promise((r) => setTimeout(r, 3000 * i));
+    }
+    console.warn('[mercado] usando dados SIMULADOS. Vou tentar os dados reais de novo a cada 10 minutos.');
+    this.initSimulated();
+  }
+
+  // tenta carregar os dados reais; devolve true se conseguiu
+  async tryReal() {
     try {
+      const daily = {}, metas = {};
       for (const t of TICKERS) {
         const { candles, meta } = await yahooChart(t, '1y', '1d');
-        this.daily[t] = candles;
-        this.setQuote(t, meta.regularMarketPrice, meta.chartPreviousClose ?? candles[candles.length - 2]?.close);
+        daily[t] = candles; metas[t] = meta;
+      }
+      this.daily = daily;
+      for (const t of TICKERS) {
+        this.setQuote(t, metas[t].regularMarketPrice, metas[t].chartPreviousClose ?? daily[t][daily[t].length - 2]?.close);
       }
       this.source = 'yahoo';
-      await this.refresh();
+      this.sourceChangedAt = Date.now();
       console.log('[mercado] dados reais do Yahoo Finance carregados');
+      await this.refresh();
+      return true;
     } catch (e) {
-      console.warn(`[mercado] não foi possível buscar dados reais (${e.message}). Usando dados SIMULADOS.`);
-      this.initSimulated();
+      console.warn(`[mercado] não foi possível buscar dados reais (${e.message}).`);
+      return false;
     }
   }
 
   initSimulated() {
     this.source = 'simulado';
+    this.lastRealTry = Date.now();
     const now = Math.floor(Date.now() / 1000);
     for (const t of TICKERS) {
       const rand = mulberry32([...t].reduce((a, c) => a * 31 + c.charCodeAt(0), 7));
@@ -129,6 +146,10 @@ class Market {
   // Atualiza as cotações. No modo simulado, cada atualização = 1 pregão novo (acelerado),
   // para você conseguir ver o robô trabalhando rápido.
   async refresh() {
+    if (this.source === 'simulado' && !process.env.FORCE_SIMULATED && Date.now() - (this.lastRealTry || 0) > 10 * 60 * 1000) {
+      this.lastRealTry = Date.now();
+      if (await this.tryReal()) return;
+    }
     if (this.source === 'simulado') {
       for (const t of TICKERS) {
         const c = this.daily[t];
